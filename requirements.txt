@@ -1,7 +1,6 @@
 streamlit
 nltk
 pymupdf
-sqlalchemy
 pandas
 scikit-learn
-sqlite
+sqlite3
