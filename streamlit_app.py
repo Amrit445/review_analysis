@@ -209,5 +209,5 @@ if uploaded_file:
     
     # Display database records
     st.subheader("All Parsed Resumes")
-    df = pd.read_sql_table("candidates", conn)
+    df = pd.read_sql_query("SELECT * FROM candidates", conn)
     st.dataframe(df)
