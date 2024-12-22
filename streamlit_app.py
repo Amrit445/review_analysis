@@ -50,7 +50,7 @@ create_tables()
 
 
 #----------------------------------------------------------------------#
-def extract_text_from_pdf(file_path):
+def extract_text_from_pdf(uploaded_file):
     try:
         pdf_text = ""
         with fitz.open(stream=uploaded_file.read(), filetype="pdf") as doc:
