@@ -3,8 +3,6 @@ import fitz
 import nltk
 nltk.download('punkt_tab')
 nltk.download('averaged_perceptron_tagger_eng')
-from sqlalchemy import create_engine, Column, String, Integer, MetaData, Table, inspect
-from sqlalchemy.ext.declarative import declarative_base
 import streamlit as st
 import pandas as pd
 import sqlite3
