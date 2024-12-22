@@ -53,11 +53,15 @@ create_tables()
 
 #----------------------------------------------------------------------#
 def extract_text_from_pdf(file_path):
-    with fitz.open(file_path) as pdf:
-        text = ""
-        for page in pdf:
-            text += page.get_text()
-    return text
+    try:
+        pdf_text = ""
+        with fitz.open(stream=uploaded_file.read(), filetype="pdf") as doc:
+            for page in doc:
+                text += page.get_text()
+        return pdf_text
+    except Exception as e:    
+        st.error("Error reading PDF file.")
+        return None
 
 def extract_skills(text, skill_set):
     text = text.lower()
@@ -145,12 +149,13 @@ skill_set1=["python", "Data Analysis", "Machine Learning", "Communication", "Pro
 
 
 skill_set=[element.lower() for element in skill_set1]
+
 if uploaded_file:
-    with open("temp_resume.pdf", "wb") as f:
-        f.write(uploaded_file.getbuffer())
+    # with open("temp_resume.pdf", "wb") as f:
+    #     f.write(uploaded_file.getbuffer())
     
     # Extract and process resume
-    text = extract_text_from_pdf("temp_resume.pdf")
+    text = extract_text_from_pdf(uploaded_file)
     skills = extract_skills(text, skill_set)
     experience = extract_experience(text)
     name = extract_candidate_name(text)
@@ -209,5 +214,9 @@ if uploaded_file:
     
     # Display database records
     st.subheader("All Parsed Resumes")
+    # df = pd.read_sql_table("candidates", engine)
     df = pd.read_sql_query("SELECT * FROM candidates", conn)
     st.dataframe(df)
+
+
+    conn.close()
