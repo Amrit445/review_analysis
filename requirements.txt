@@ -5,3 +5,4 @@ pandas
 nltk
 requests
 beautifulsoup4
+transformers
