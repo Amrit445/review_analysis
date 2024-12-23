@@ -35,7 +35,7 @@ def extract_reviews(url, max_pages=1):
     return pd.DataFrame(reviews)
 
 # Title
-st.title("Amazon Product Review Analysis")
+st.title("Product Review Analysis")
 
 # Sidebar
 st.sidebar.title("Navigation")
@@ -43,9 +43,9 @@ option = st.sidebar.radio("Go to:", ["Extract Reviews", "Review Summarization", 
 
 # Review Extraction
 if option == "Extract Reviews":
-    st.header("Extract Reviews from Amazon")
+    st.header("Extract Reviews ")
 
-    url_input = st.text_input("Enter Amazon Product URL:")
+    url_input = st.text_input("Enter Product URL:")
 
     if st.button("Extract Reviews"):
         if url_input:
