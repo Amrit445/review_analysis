@@ -7,32 +7,50 @@ import streamlit as st
 
 # Function to extract reviews from Amazon product URL
 def extract_reviews(url, max_pages=1):
+    # Ensure the URL is for the product reviews page
+    if "/product-reviews/" not in url:
+        st.error("Please provide a valid Amazon product reviews URL.")
+        return pd.DataFrame()
+
     headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
+        "Accept-Language": "en-US,en;q=0.9",
     }
     reviews = []
     page = 1
 
     while page <= max_pages:
-        response = requests.get(f"{url}&pageNumber={page}", headers=headers)
-        if response.status_code != 200:
-            st.warning(f"Failed to fetch page {page}. Status code: {response.status_code}")
+        try:
+            # Construct the review page URL with pagination
+            paginated_url = f"{url}?pageNumber={page}"
+            response = requests.get(paginated_url, headers=headers)
+
+            if response.status_code != 200:
+                st.warning(f"Failed to fetch page {page}. Status code: {response.status_code}")
+                break
+
+            soup = BeautifulSoup(response.text, 'html.parser')
+            review_divs = soup.find_all("div", {"data-hook": "review"})
+
+            for div in review_divs:
+                try:
+                    review_text = div.find("span", {"data-hook": "review-body"}).text.strip()
+                    star_rating = div.find("i", {"data-hook": "review-star-rating"}).text.strip()
+                    reviews.append({"review": review_text, "star_rating": star_rating})
+                except AttributeError:
+                    continue
+
+            page += 1
+        except Exception as e:
+            st.error(f"An error occurred while fetching reviews: {e}")
             break
 
-        soup = BeautifulSoup(response.text, 'html.parser')
-        review_divs = soup.find_all("div", {"data-hook": "review"})
+    if reviews:
+        return pd.DataFrame(reviews)
+    else:
+        st.error("No reviews found or failed to fetch reviews.")
+        return pd.DataFrame()
 
-        for div in review_divs:
-            try:
-                review_text = div.find("span", {"data-hook": "review-body"}).text.strip()
-                star_rating = div.find("i", {"data-hook": "review-star-rating"}).text.strip()
-                reviews.append({"review": review_text, "star_rating": star_rating})
-            except AttributeError:
-                continue
-
-        page += 1
-
-    return pd.DataFrame(reviews)
 
 # Title
 st.title("Product Review Analysis")
